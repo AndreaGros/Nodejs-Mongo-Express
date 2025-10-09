@@ -4,7 +4,7 @@
 import http, { request, Server } from 'http'
 import fs from 'fs'
 import express from 'express'
-import people from "./people.json"
+import news from "./news.json"
 
 // configurazione server
 const port: number = 3000
@@ -44,49 +44,17 @@ app.use("/", function (req, res, next) {
     next()
 })
 
-app.get("/api/getCountries", function (req, res, next) {
-
-    // const countries: string[] = []
-    // for (const person of people.results) {
-    //     if (!countries.includes(person.location.country))
-    //         countries.push(person.location.country)
-    // }
-    // countries.sort()
-
-    // res.send(countries)
-
-    let countries: string[] = []
-    // set non accetta duplicato ma non è un vettore, quindi va convertito
-    let set = new Set(countries)
-    for (const person of people.results)
-        set.add(person.location.country)
-    countries = [...set]
-    countries.sort()
-    res.send(countries)
+app.get("/api/elenco", function(req, res, next){
+    res.send(news)
 })
 
-app.get("/api/getPeopleByCountry", function (req, res, next) {
-    if (!req.query)
-        res.status(400).send("parametri mancanti")
-    else {
-        const peopleByCountry: any = people.results.filter(p => p.location.country === req.query.country).map(p => ({
-            name: p.name,
-            city: p.location.city,
-            state: p.location.state,
-            cell: p.cell
-        }))
-        res.send(peopleByCountry)
-    }
-})
-
-app.get("/api/getDetails", function (req, res, next) {
-    const name = req.query
-    if (!name)
-        res.status(400).send("Paramatro mancante")
-    else {
-        const person = people.results.find(p => JSON.stringify(p.name) == JSON.stringify(name))
-        res.send(person) 
-    }
+app.post("/api/dettagli", function(req, res, next){
+    const fileName = req.body.fileName
+    let dettagli = fs.readFileSync(`./news/${fileName}`, "utf-8")
+    const notizia = news.find( n => n.file == fileName)
+    if(notizia) notizia.visualizzazioni++
+    fs.writeFileSync("./news.json", JSON.stringify(news, null, 3))
+    res.send({"file":dettagli})
 })
 
 app.use("/", function (req, res, next) {
