@@ -5,6 +5,7 @@ import http, { request, Server } from 'http'
 import fs from 'fs'
 import express from 'express'
 import states from "./states.json"
+import radios from "./radios.json"
 
 // configurazione server
 const port: number = 3000
@@ -42,6 +43,34 @@ app.use("/", function (req, res, next) {
     if (req.body && Object.keys(req.body).length > 0)
         console.log("Parametri body: " + JSON.stringify(req.body))
     next()
+})
+
+app.get("/api/elenco", function (req, res, next) {
+    res.send(states)
+})
+
+app.post("/api/radios", function (req, res, next) {
+    let region: string = req.body.region
+    let regionRadios
+    if (region != 'tutti')
+        regionRadios = radios.filter(radio => radio.state == region)
+    else
+        regionRadios = radios
+    res.send(regionRadios)
+})
+
+app.patch("/api/like", function (req, res, next) {
+    let id: string = req.body.id
+    const radio = radios.find(r => r.id == id)
+    if (radio) {
+        let nVotes: number = parseInt(radio.votes)
+        nVotes++
+        radio.votes = String(nVotes)
+        fs.writeFileSync("./radios.json", JSON.stringify(radios, null, 3))
+        res.send({radio})
+    }
+    else
+        res.send({"radio":"not found"})
 })
 
 app.use("/", function (req, res, next) {
