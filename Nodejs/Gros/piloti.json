@@ -1,0 +1,232 @@
+[
+ {	
+    "scuderia":"Mercedes-AMG Petronas Formula One Team",
+    "pneumatici": "Pirelli",
+    "motore": "Mercedes",
+    "piloti": [
+      {
+        "nome": "Lewis Hamilton",
+        "numero": 44,
+        "nazione": "Regno Unito",
+		"countryCode" : "GB",
+        "data_di_nascita": "7 gennaio 1985",
+		"punti": 0
+      },
+      {
+        "nome": "Valtteri Bottas",
+        "numero": 77,
+        "nazione": "Finlandia",
+		"countryCode" : "FI",
+        "data_di_nascita": "28 agosto 1989",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":"Red Bull Racing",
+    "pneumatici": "Pirelli",
+    "motore": "Honda",
+    "piloti": [
+      {
+        "nome": "Max Verstappen",
+        "numero": 33,
+        "nazione": "Paesi Bassi",
+		"countryCode" : "NL",
+        "data_di_nascita": "30 settembre 1997",
+		"punti":0
+      },
+      {
+        "nome": "Sergio Perez",
+        "numero": 11,
+        "nazione": "Messico",
+		"countryCode" : "MX",
+        "data_di_nascita": "26 gennaio 1990",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Ferrari",
+    "pneumatici": "Pirelli",
+    "motore": "Ferrari",
+    "piloti": [
+      {
+        "nome": "Charles Leclerc",
+        "numero": 16,
+        "nazione": "Monaco",
+		"countryCode" : "MC",
+        "data_di_nascita": "16 ottobre 1997",
+		"punti":0
+      },
+      {
+        "nome": "Carlos Sainz",
+        "numero": 55,
+        "nazione": "Spagna",
+		"countryCode" : "ES",
+        "data_di_nascita": "1º settembre 1994",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "McLaren F1 Team",
+    "pneumatici": "Pirelli",
+    "motore": "Mercedes",
+    "piloti": [
+      {
+        "nome": "Lando Norris",
+        "numero": 4,
+        "nazione": "Regno Unito",
+		"countryCode" : "GB",
+        "data_di_nascita": "13 novembre 1999",
+		"punti":0
+      },
+      {
+        "nome": "Daniel Ricciardo",
+        "numero": 3,
+        "nazione": "Australia",
+		"countryCode" : "AU",
+        "data_di_nascita": "1º luglio 1989",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Aston Martin Cognizant Formula One Team",
+    "pneumatici": "Bridgestone",
+    "motore": "Mercedes",
+    "piloti": [
+      {
+        "nome": "Sebastian Vettel",
+        "numero": 5,
+        "nazione": "Germania",
+		"countryCode" : "DE",
+        "data_di_nascita": "3 luglio 1987",
+		"punti":0
+      },
+      {
+        "nome": "Lance Stroll",
+        "numero": 18,
+        "nazione": "Canada",
+		"countryCode" : "CA",
+        "data_di_nascita": "29 ottobre 1998",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Alpine F1 Team",
+    "pneumatici": "Pirelli",
+    "motore": "Renault",
+    "piloti": [
+      {
+        "nome": "Fernando Alonso",
+        "numero": 14,
+        "nazione": "Spagna",
+		"countryCode" : "ES",
+        "data_di_nascita": "29 luglio 1981",
+		"punti":0
+      },
+      {
+        "nome": "Esteban Ocon",
+        "numero": 31,
+        "nazione": "Francia",
+		"countryCode" : "FR",
+        "data_di_nascita": "17 settembre 1996",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Scuderia AlphaTauri Honda",
+    "pneumatici": "Pirelli",
+    "motore": "Honda",
+    "piloti": [
+      {
+        "nome": "Pierre Gasly",
+        "numero": 10,
+        "nazione": "Francia",
+		"countryCode" : "FR",
+        "data_di_nascita": "7 febbraio 1996",
+		"punti":0
+      },
+      {
+        "nome": "Yuki Tsunoda",
+        "numero": 22,
+        "nazione": "Giappone",
+		"countryCode" : "JP",
+        "data_di_nascita": "11 maggio 2000",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Alfa Romeo Racing Orlen",
+    "pneumatici": "Pirelli",
+    "motore": "Ferrari",
+    "piloti": [
+      {
+        "nome": "Kimi Raikkonen",
+        "numero": 7,
+        "nazione": "Finlandia",
+		"countryCode" : "FI",
+        "data_di_nascita": "17 ottobre 1979",
+		"punti":0
+      },
+      {
+        "nome": "Antonio Giovinazzi",
+        "numero": 99,
+        "nazione": "Italia",
+		"countryCode" : "IT",
+        "data_di_nascita": "14 dicembre 1993",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Haas F1 Team",
+    "pneumatici": "Bridgestone",
+    "motore": "Ferrari",
+    "piloti": [
+      {
+        "nome": "Nikita Mazepin",
+        "numero": 9,
+        "nazione": "Russia",
+		"countryCode" : "RU",
+        "data_di_nascita": "2 marzo 1999",
+		"punti":0
+      },
+      {
+        "nome": "Mick Schumacher",
+        "numero": 47,
+        "nazione": "Germania",
+		"countryCode" : "DE",
+        "data_di_nascita": "22 marzo 1999",
+		"punti":0
+      }
+    ]
+  },
+  {
+    "scuderia":  "Williams Racing",
+    "pneumatici": "Pirelli",
+    "motore": "Mercedes",
+    "piloti": [
+      {
+        "nome": "George Russell",
+        "numero": 63,
+        "nazione": "Regno Unito",
+		"countryCode" : "GB",
+        "data_di_nascita": "15 febbraio 1998",
+		"punti":0
+      },
+      {
+        "nome": "Nicholas Latifi",
+        "numero": 6,
+        "nazione": "Canada",
+		"countryCode" : "CA",
+        "data_di_nascita": "29 giugno 1995",
+		"punti":0
+      }
+    ]
+  }
+]
