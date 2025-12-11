@@ -9,10 +9,10 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    // "types": [],
+    "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
-    "types": ["node"],
+    // "types": ["node"],
     // and npm install -D @types/node
 
     // Other Outputs
@@ -40,6 +40,7 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "resolveJsonModule": true //consente di importare un file json dentro un file javascript/typescript
+    //consente di portare un file json dentro un javascript o typescript 
+    "resolveJsonModule": true
   }
 }
