@@ -468,6 +468,63 @@ async function executeQuery(query: number) {
         }
       ]).toArray();
       break
+    case 51:
+      collection = client.db(dbname).collection("unicorns")
+      cmd = collection.aggregate([
+        { $match: { gender: { $in: ["m", "f"] } } },
+        {
+          $group:
+            { _id: "$gender", pesoMedio: { $avg: "$weight" } }
+        }
+      ]).toArray()
+      break
+    case 52:
+      // Considerando soltanto gli unicorni che amano le mele, trovare il numero di vampiri complessivamente uccisi
+      // dagli unicorni maschi ed il numero di vampiri complessivamente uccisi dagli unicorni femmina.Limitare la
+      // ricerca ai gruppi che hanno ucciso almeno 120 vampiri
+      collection = client.db(dbname).collection("unicorns")
+      cmd = collection.aggregate([
+        { $match: { loves: "$grape", gender: { $in: ["f", "g"] } } },
+        {
+          $group: {
+            _id: "$gender",
+            vampiriUccisi: { $sum: "$vampires" }
+          }
+        },
+        { $match: { vampiriUccisi: { $gt: 120 } } }
+      ]).toArray()
+      break
+    case 53:
+      // Visualizzare i nomi dei frutti più amati dagli unicorni, in ordine di preferenza.
+      collection = client.db(dbname).collection("unicorns")
+      cmd = collection.aggregate([
+        { $unwind: "$loves" },
+        {
+          $group: {
+            _id: "$loves",
+            sumLove: { $sum: 1 }
+          }
+        },
+        { $sort: { sumLove: -1 } }
+      ]).toArray()
+      break
+    case 54:
+      // Visualizzare i tre studenti di quarta con la media più alta
+      collection = client.db(dbname).collection("students")
+      cmd = collection.aggregate([
+        { $match: { classe: /4/i } },
+        {
+          $project: {
+            _id: 0,
+            nome: 1,
+            classe: 1,
+            media: { $avg: "$voti" }
+          }
+        },
+        { $sort: { media: -1 } },
+        { $limit: 3 }
+      ]).toArray()
+      break
   }
   cmd?.then(function (data) {
     console.log(JSON.stringify(data, null, 2));
@@ -483,4 +540,4 @@ async function executeQuery(query: number) {
   });
 }
 
-executeQuery(50);
+executeQuery(54);
