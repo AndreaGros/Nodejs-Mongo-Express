@@ -22,7 +22,8 @@ async function getUsers() {
 			td.textContent = user.username
 			tr.append(td)
 
-			user.img = "./img/" + user.img
+			if(!user.img.startsWith("https://res.cloudinary.com"))
+				user.img = "./img/" + user.img
 
 			td = document.createElement("td")
 			tr.append(td)
@@ -60,6 +61,7 @@ for (const button of buttons) {
 		let formData = new FormData()
 		let HTTPResponse
 		let imgBase64
+		let params
 		switch (button.id) {
 			case "btnBinary":
 				formData.append("user", user)
@@ -69,12 +71,27 @@ for (const button of buttons) {
 				break
 			case "btnBase64":
 				imgBase64 = await base64Convert(blob)
-				const params = {
-					"username": user,
+				params = {
+					"user": user,
 					"fileName": blob.name,
 					"imgBase64": imgBase64
 				}
 				HTTPResponse = await inviaRichiesta("POST", "/saveBase64", params)
+				break
+			case "btnBase64Cloudinary":
+				imgBase64 = await resizeAndConvert(blob)
+				params = {
+					"user": user,
+					"fileName": blob.name,
+					"imgBase64": imgBase64
+				}
+				HTTPResponse = await inviaRichiesta("POST", "/saveBase64Cloudinary", params)
+				break
+			case "btnBinaryCloudinary":
+				formData.append("user", user)
+				formData.append("blob", blob)
+				console.log(formData)
+				HTTPResponse = await inviaRichiesta("POST", "/saveBinaryCloudinary", formData)
 				break
 			default:
 				break

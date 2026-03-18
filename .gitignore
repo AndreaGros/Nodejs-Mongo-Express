@@ -153,4 +153,7 @@ Session.vim
 # auto-generated tag files
 tags
 
+**/certificate.crt
+**/privateKey.pem
+
 # End of https://www.gitignore.io/api/node,vim,git,macos,linux,sublimetext

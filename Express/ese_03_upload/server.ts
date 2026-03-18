@@ -116,7 +116,7 @@ app.post("/api/saveBinary", async function (req: any, res, nex) {
     }
 })
 
-app.post("/api/saveImg64", async function (req: any, res, nex) {
+app.post("/api/saveBase64", async function (req: any, res, nex) {
     const user = req.body.user
     let fileName = req.body.fileName
     const imgBase64 = req.body.imgBase64
@@ -130,6 +130,43 @@ app.post("/api/saveImg64", async function (req: any, res, nex) {
         const newUser = {
             "username": user,
             "img": fileName
+        }
+        aggiornaDB(newUser, res)
+    }
+})
+
+app.post("/api/saveBase64Cloudinary", async function (req: any, res, nex) {
+    const user = req.body.user
+    let fileName = req.body.fileName
+    const imgBase64 = req.body.imgBase64
+
+    const result = await fileManager.saveBase64Cloudinary(fileName, imgBase64).catch(err => {
+        res.status(500)
+        res.send("Errore nel salvataggio su cloudinary: " + err)
+    })
+    if (result) {
+        const newUser = {
+            "username": user,
+            "img": result.secure_url
+        }
+        aggiornaDB(newUser, res)
+    }
+})
+
+app.post("/api/saveBinaryCloudinary", async function (req: any, res, nex) {
+    const user = req.body.user
+    // i file sono inseriti dentro req.files e non req.bidy anche se è una POST
+    const uploadedFile = req.files.blob
+
+    const result = await fileManager.saveBinaryCloudinary(uploadedFile.name, uploadedFile.data).catch(err => {
+        res.status(500)
+        res.send(err)
+    })
+
+    if (result) {
+        const newUser = {
+            "username": user,
+            "img": result.secure_url
         }
         aggiornaDB(newUser, res)
     }
@@ -157,12 +194,14 @@ async function aggiornaDB(newUser: any, res: any) {
 
 //F. default root e gestione errori
 app.use(function (req, res) {
-    res.status(404);
-
-    if (!req.originalUrl.startsWith("/api/"))
-        res.send(paginaErr);
+    if (!req.originalUrl.startsWith("/api/")) {
+        // servizio non trovato
+        res.status(404).send(paginaErr);
+    }
+    else if (req.accepts("html"))
+        res.status(404).send(paginaErr);
     else
-        res.send("Risorsa non trovata");
+        res.sendStatus(404)
 });
 
 //G. gestione errori

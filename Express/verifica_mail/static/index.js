@@ -84,7 +84,7 @@ $(document).ready(function () {
 		console.log(formData)
 		const HTTPResponse = await inviaRichiesta("POST", "/send", formData)
 		if (HTTPResponse.status == 200) {
-
+			alert("Inviato")
 		}
 		else {
 			if (HTTPResponse.status == 503)

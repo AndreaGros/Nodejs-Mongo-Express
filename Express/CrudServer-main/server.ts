@@ -21,11 +21,11 @@ const server: http.Server = http.createServer(app);
 let paginaErr = "";
 
 //server in ascolto sulla porta 1337
-server.listen(port, function(){
+server.listen(port, function () {
     console.log("Server in ascolto sulla porta " + port);
 
-    fs.readFile("./static/error.html", function(err, content){ //content è una sequenza di byte
-        if(err)
+    fs.readFile("./static/error.html", function (err, content) { //content è una sequenza di byte
+        if (err)
             paginaErr = "<h1>Risorsa non trovata</h1>";
         else
             paginaErr = content.toString();
@@ -34,7 +34,7 @@ server.listen(port, function(){
 
 //D. middleware
 //middleware 1: request log
-app.use(function(req, res, next) //se si omette => come risorsa "/"
+app.use(function (req, res, next) //se si omette => come risorsa "/"
 {
     console.log("Ricevuta richiesta: " + req.method + ": " + req.originalUrl);
     next(); //passa al middleware successivo
@@ -44,7 +44,7 @@ app.use(function(req, res, next) //se si omette => come risorsa "/"
 app.use(express.static("./static"));
 
 //middleware 3: gestione dei parametri post
-app.use(express.json({"limit": "5mb"})); //i parametri post sono restituiti in req.body
+app.use(express.json({ "limit": "5mb" })); //i parametri post sono restituiti in req.body
 //i parametri get invece sono restituiti come json in req.query
 
 //middleware 4: parsing dei parametri GET
@@ -52,7 +52,7 @@ app.use("/", queryStringParser);
 
 //middleware 5: log dei parametri
 app.use((req: any, res, next) => {
-    if(req.body && Object.keys(req.body).length > 0)
+    if (req.body && Object.keys(req.body).length > 0)
         console.log("   Parametri body: " + JSON.stringify(req.body));
 
     if (req["parsedQuery"] && Object.keys(req["parsedQuery"]).length > 0)
@@ -63,7 +63,7 @@ app.use((req: any, res, next) => {
 
 //middleware 6: Vincoli CORS (controlli lato server che consentono di accettare richieste anche da fuori dal dominio -> cioè diverso dal server da cui arrivano le pagine)
 const corsOptions = {
-    origin: function(origin: any, callback: any) {
+    origin: function (origin: any, callback: any) {
         return callback(null, true);
     },
     credentials: true
@@ -72,10 +72,10 @@ app.use("/", cors(corsOptions));
 
 
 //E. gestione delle root dinamiche
-app.get("/api/getCollections", async function(req, res, next){
+app.get("/api/getCollections", async function (req, res, next) {
     const client = new MongoClient(connStr!);
 
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -96,7 +96,7 @@ app.get("/api/:collection", async (req: any, res, next) => {
     const filters = req["parsedQuery"];
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -118,7 +118,7 @@ app.get("/api/:collection/:id", async (req, res, next) => {
     const id = req.params.id;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -140,7 +140,7 @@ app.post("/api/:collection/", async (req, res, next) => {
     const newRecord = req.body;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -163,7 +163,7 @@ app.patch("/api/:collection/:id", async (req, res, next) => {
     const action = req.body;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -186,7 +186,7 @@ app.put("/api/:collection/:id", async (req, res, next) => {
     const action = req.body;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -209,7 +209,7 @@ app.put("/api/:collection", async (req, res, next) => {
     const action = req.body.action;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -231,7 +231,7 @@ app.delete("/api/:collection/:id", async (req, res, next) => {
     const _id = req.params.id;
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -253,7 +253,7 @@ app.delete("/api/:collection", async (req: any, res, next) => {
     const filters = req["parsedQuery"];
 
     const client = new MongoClient(connStr!);
-    await client.connect().catch(err => { 
+    await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
         return;
     });
@@ -271,17 +271,19 @@ app.delete("/api/:collection", async (req: any, res, next) => {
 })
 
 //F. default root e gestione errori
-app.use(function(req, res){
-    res.status(404);
-    
-    if(!req.originalUrl.startsWith("/api/"))
-        res.send(paginaErr);
+app.use(function (req, res) {
+    if (!req.originalUrl.startsWith("/api/")) {
+        // servizio non trovato
+        res.status(404).send(paginaErr);
+    }
+    else if (req.accepts("html"))
+        res.status(404).send(paginaErr);
     else
-        res.send("Risorsa non trovata");
+        res.sendStatus(404)
 });
 
 //G. gestione errori
-app.use(function(err: Error, req: express.Request, res: express.Response, next: express.NextFunction){
+app.use(function (err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
     console.error("*** ERRORE ***:\n" + err.stack); //elenco completo degli errori
     res.status(500).send("Errore interno del server");
 });
