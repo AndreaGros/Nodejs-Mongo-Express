@@ -2,18 +2,21 @@
 import http from "http";
 import https from "https";
 import fs from "fs";
-import express from "express";
+import express, { CookieOptions } from "express";
 import dotenv from "dotenv";
 import { MongoClient, ObjectId } from "mongodb";
 import queryStringParser from "./queryStringParser";
 import cors from "cors";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
+import cookieParser from "cookie-parser"
 
 //B. configurazioni
 //riconosce i tipi automaticamente (non è any) -> grazie @types/node in devDependencies (sviluppo)
 const app = express();
 //stessa cosa -> const app: express.Express = express();
 dotenv.config({ path: ".env" });
-const connStr = process.env.connectionStringAtlas;
+const connStr = process.env.connectionStringLocal;
 
 const PORT = parseInt(process.env.PORT!);
 
@@ -24,26 +27,27 @@ const server: http.Server = http.createServer(app);
 let paginaErr = "";
 
 //server in ascolto sulla porta 1337
-server.listen(PORT, function () {
-    // console.log("Server in ascolto sulla porta " + PORT);
+// server.listen(PORT, function () {
+//     // console.log("Server in ascolto sulla porta " + PORT);
 
-    fs.readFile("./static/error.html", function (err, content) { //content è una sequenza di byte
-        if (err)
-            paginaErr = "<h1>Risorsa non trovata</h1>";
-        else
-            paginaErr = content.toString();
-    })
-});
+//     fs.readFile("./static/error.html", function (err, content) { //content è una sequenza di byte
+//         if (err)
+//             paginaErr = "<h1>Risorsa non trovata</h1>";
+//         else
+//             paginaErr = content.toString();
+//     })
+// });
 
 const privateKey = fs.readFileSync("keys/privateKey.pem", "utf8");
 const certificate = fs.readFileSync("keys/certificate.crt", "utf8");
 const credentials = { "key": privateKey, "cert": certificate };
 const HTTPS_PORT = parseInt(process.env.HTTPS_PORT!)
+const jwtKey = fs.readFileSync("keys/jwtkey", "utf-8")
 
 let httpServer = https.createServer(credentials, app)
 
 httpServer.listen(HTTPS_PORT, function () {
-    console.log("Server in ascolto sulla porta " + PORT + " e HTTPS: " + HTTPS_PORT);
+    console.log("Server in ascolto sulla porta: " + HTTPS_PORT);
 })
 
 //D. middleware
@@ -84,9 +88,19 @@ const corsOptions = {
 };
 app.use("/", cors(corsOptions));
 
+app.use(cookieParser())
+
+const cookiesOptions: CookieOptions = {
+    path: "/", //vale per tutte le sotto root
+    httpOnly: true,
+    secure: true,
+    maxAge: parseInt(process.env.DURATA_TOKEN!) * 1000, // durata relatica a partire da ora espressa in ms
+    sameSite: "none"
+}
 // D2. Gestione login e token
 app.post("/api/login", async (req: any, res, next) => {
     let username = req.body.username
+    let password = req.body.password
     const client = new MongoClient(connStr!);
     await client.connect().catch(err => {
         res.status(503).send("Errore di connessione al DBMS")
@@ -99,14 +113,87 @@ app.post("/api/login", async (req: any, res, next) => {
         res.status(500).send("Errore esecuzione query: " + err)
     })
     cmd.then((dbUser) => {
-        
+        if (!dbUser)
+            res.status(401).send("Username non valido")
+        else {
+            console.log("Password ricevuta: ", password, "Password DB: ", dbUser.password)
+            bcrypt.compare(password, dbUser.password, (err, ok) => {
+                if (err) {
+                    res.status(500).send("Bcrypt execution error")
+                    console.log(err.stack)
+                }
+                else if (!ok) {
+                    res.status(401).send("Password non valida")
+                }
+                else {
+                    const TOKEN = createToken(dbUser)
+                    res.cookie("TOKEN", TOKEN, cookiesOptions)
+                    res.send({ username })
+                }
+            })
+        }
+    })
+    cmd.finally(() => {
+        client.close()
     })
 })
 
+app.post("/api/loginWithGoogle", async (req, res, next) => {
+    const googleToken = req.body.googleToken
+    let payloadGoogleToken = jwt.decode(googleToken)!
+    console.log("Google Token: ", payloadGoogleToken)
+    const client = new MongoClient(connStr!)
+    await client.connect().catch((err) => {
+        res.status(503).send("Errore di connessione al Database")
+        return
+    })
+
+    const collection = client.db(dbName).collection("mails")
+    const cmd = collection.findOne({ username: payloadGoogleToken.email })
+    cmd.catch((err) => {
+        res.status(500).send("Errore esecuzione query " + err)
+        return
+    })
+    cmd.then((dbUser)=>{
+        if(!dbUser){
+            let password = ""
+            for (let i = 0; i < 12; i++) {
+                password += String.fromCharCode
+                
+            }
+        }
+    })
+})
+
+app.use("/api", (req: any, res, next) => {
+    if (!req.cookies || !req.cookies.TOKEN)
+        res.status(403).send("Token mancante o scaduto")
+    else {
+        let token = req.cookies.TOKEN;
+        jwt.verify(token, jwtKey, (err: any, payload: any) => {
+            if (err) res.status(403).send("Token non valido o scaduto")
+            else {
+                let newToken = createToken(payload)
+                res.cookie("TOKEN", newToken, cookiesOptions)
+                req["username"] = payload.username
+                next()
+            }
+        })
+    }
+})
+
+app.post("/api/logout", async (req, res, next) => {
+    const options = {
+        ...cookiesOptions, maxAge: -1
+    }
+    res.cookie("TOKEN", "", options)
+    res.send({ ok: 1 })
+})
+
 //con filtri
-app.get("/api/:collection", async (req: any, res, next) => {
-    const selectedCollection = req.params.collection;
-    const filters = req["parsedQuery"];
+app.get("/api/mails", async (req: any, res, next) => {
+    const username = req["username"]
+    const currentCollection: string = "mails"
 
     const client = new MongoClient(connStr!);
     await client.connect().catch(err => {
@@ -114,9 +201,9 @@ app.get("/api/:collection", async (req: any, res, next) => {
         return;
     });
 
-    const collection = client.db(dbName).collection(selectedCollection);
+    const collection = client.db(dbName).collection(currentCollection);
 
-    const cmd = collection.find(filters).toArray();
+    const cmd = collection.findOne({ username: username }, { projection: { mail: 1 } })
 
     //restituisce elenco delle collezioni del db (formato JSON)
     const data = await cmd.catch(err => res.status(500).send("Errore di connessione al dbms: " + err));
@@ -145,3 +232,17 @@ app.use(function (err: Error, req: express.Request, res: express.Response, next:
     console.error("*** ERRORE ***:\n" + err.stack); //elenco completo degli errori
     res.status(500).send("Errore interno del server");
 });
+
+
+function createToken(data: any) {
+    const now = Math.floor(((new Date()).getTime()) / 1000)
+    const payload = {
+        _id: data._id,
+        username: data.username,
+        iat: data.iat || now,
+        exp: now + parseInt(process.env.DURATA_TOKEN!)
+    }
+    const token = jwt.sign(payload, jwtKey)
+    console.log("Creato nuovo token: ", token)
+    return token
+}

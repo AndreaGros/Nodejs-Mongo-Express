@@ -69,14 +69,12 @@
             </div>
             }
             <!-- PULSANTI -->
-            <div class="d-grid gap-1">
+            <div class="d-grid gap-1 d-flex flex-column align-items-center">
                 <button type="button" class="btn btn-secondary" (click)="controllaLogin(loginForm)">
                     LOGIN
                 </button>
 
-                <button type="button" class="btn btn-secondary mt-2">
-                    LOGIN WITH GOOGLE
-                </button>
+                <div id="myGoogleDiv"></div>
 
                 <div id="googleDiv"></div>
 
@@ -87,6 +85,7 @@
                 <button type="button" class="btn btn-link mt-0 p-0" id="btnPasswordDimenticata">
                     hai dimenticato la password?
                 </button>
+
             </div>
         </div>
         <div class="col-md-3 col-sm-2"></div>

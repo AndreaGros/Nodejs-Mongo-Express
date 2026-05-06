@@ -1,2 +1,2 @@
-<app-header-component></app-header-component>
-<app-login-component></app-login-component>
+<app-header-component [showLogout]="showLogout"></app-header-component>
+<router-outlet (activate)="onActivate($event)"></router-outlet>

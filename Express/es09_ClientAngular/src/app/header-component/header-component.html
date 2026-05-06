@@ -5,12 +5,13 @@
             <img src="img/vallauri.jpg" class="img-fluid" alt="Vallauri">
         </div>
 
+        @if(showLogout){
         <div class="col-sm-1 text-end align-self-center mt-3">
-            <button type="button" class="btn btn-secondary" id="btnLogout">
+            <button type="button" class="btn btn-secondary" id="btnLogout" (click)="doLogout()">
                 Logout
             </button>
         </div>
-
+        }
         <div class="col-sm-3"></div>
     </div>
 </div>
